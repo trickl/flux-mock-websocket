@@ -10,7 +10,6 @@ public class WebSocketConfiguration {
 
   @Bean
   ObjectMapper objectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper;
+    return new ObjectMapper();
   }
 }

@@ -1,8 +1,8 @@
 package com.trickl.flux.websocket;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trickl.flux.config.WebSocketConfiguration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +38,7 @@ public class EchoWebSocketTest extends BaseWebSocketClientTest {
   @Test
   public void testEchoWebSocket() throws IOException, InterruptedException {
 
-    handleRequest("/websocket")
+    handleRequest()
         .awaitOpen()
         .thenSend("MESSAGE 1")
         .thenWait(500, TimeUnit.MILLISECONDS)

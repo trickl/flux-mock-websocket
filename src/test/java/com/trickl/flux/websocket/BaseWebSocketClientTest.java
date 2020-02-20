@@ -1,7 +1,5 @@
 package com.trickl.flux.websocket;
 
-import com.trickl.flux.config.WebSocketConfiguration;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
@@ -64,14 +62,14 @@ public abstract class BaseWebSocketClientTest {
 
     webSocketClient = new StandardWebSocketClient();
 
-    webSocketHeaders = () -> new HttpHeaders();
+    webSocketHeaders = HttpHeaders::new;
   }
 
   protected String getTransportPath() {
     return server.url("/").uri().getPath();
   }
 
-  protected MockWebSocket handleRequest(String path) {
+  protected MockWebSocket handleRequest() {
     MockWebSocket webSocket = new MockWebSocket();
     MockResponse response = new MockResponse().withWebSocketUpgrade(webSocket);
     this.server.enqueue(response);
