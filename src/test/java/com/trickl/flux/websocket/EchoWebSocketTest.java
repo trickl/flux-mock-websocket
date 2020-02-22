@@ -5,7 +5,8 @@ import com.trickl.flux.config.WebSocketConfiguration;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,11 +20,12 @@ import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClien
 import org.springframework.web.reactive.socket.client.WebSocketClient;
 
 @RunWith(SpringRunner.class)
-@ActiveProfiles({"unittest"})
+@ActiveProfiles({ "unittest" })
 @SpringBootTest(classes = WebSocketConfiguration.class)
 public class EchoWebSocketTest extends BaseWebSocketClientTest {
 
-  @Autowired ObjectMapper objectMapper = new ObjectMapper();
+  @Autowired
+  ObjectMapper objectMapper = new ObjectMapper();
 
   @BeforeEach
   private void setup() {
@@ -38,19 +40,21 @@ public class EchoWebSocketTest extends BaseWebSocketClientTest {
   @Test
   public void testEchoWebSocket() throws IOException, InterruptedException {
 
-    handleRequest()
-        .awaitOpen()
+    new MockWebSocket(server)
+        .verifier()
+        .thenExpectOpen(Duration.ofSeconds(3))
+        //.thenExpectMessage(Pattern.compile("CONNECT.*"), Duration.ofSeconds(3))
         .thenSend("MESSAGE 1")
-        .thenWait(500, TimeUnit.MILLISECONDS)
-        .thenSend("MESSAGE 2")
-        .thenWait(500, TimeUnit.MILLISECONDS)
+        .thenWait(Duration.ofMillis(500))
+        .thenSend("MESSAGE 2") 
+        .thenWait(Duration.ofMillis(500))
         .thenSend("MESSAGE 3")
-        .thenWait(500, TimeUnit.MILLISECONDS)
+        .thenWait(Duration.ofMillis(500))
         .thenSend("MESSAGE 4")
-        .thenWait(500, TimeUnit.MILLISECONDS)
+        .thenWait(Duration.ofMillis(500))
         .thenSend("MESSAGE 5")
-        .thenWait(500, TimeUnit.MILLISECONDS)
-        .thenClose();
+        .thenWait(Duration.ofMillis(500))
+        .thenCloseAndVerify();        
 
     WebSocketClient client = new ReactorNettyWebSocketClient();
     EchoWebSocketHandler handler = new EchoWebSocketHandler();

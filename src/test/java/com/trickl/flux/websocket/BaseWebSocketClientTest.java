@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -67,12 +66,5 @@ public abstract class BaseWebSocketClientTest {
 
   protected String getTransportPath() {
     return server.url("/").uri().getPath();
-  }
-
-  protected MockWebSocket handleRequest() {
-    MockWebSocket webSocket = new MockWebSocket();
-    MockResponse response = new MockResponse().withWebSocketUpgrade(webSocket);
-    this.server.enqueue(response);
-    return webSocket;
   }
 }

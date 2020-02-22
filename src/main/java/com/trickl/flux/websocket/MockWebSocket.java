@@ -1,47 +1,28 @@
 package com.trickl.flux.websocket;
 
-import java.util.logging.Level;
-import lombok.extern.java.Log;
-import okhttp3.Response;
-import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import okio.ByteString;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import lombok.RequiredArgsConstructor;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
-@Log
-public final class MockWebSocket extends WebSocketListener {
+@RequiredArgsConstructor
+public final class MockWebSocket {
 
-  private WebSocketEventsBuilder builder;
+  private final MockWebServer server;
 
-  @Override
-  public void onOpen(WebSocket webSocket, Response response) {
-    log.info("OPEN");
-    if (builder != null) {
-      builder.runEvents(webSocket);
-    }
-  }
+  /** Expect an open event. */
+  public ClosedWebSocketStepsBuilder verifier() {
 
-  @Override
-  public void onMessage(WebSocket webSocket, String text) {
-    log.info("Server received: " + text);
-  }
+    MockWebSocketListener listener = new MockWebSocketListener();
+    MockResponse response = new MockResponse().withWebSocketUpgrade(listener);
+    this.server.enqueue(response);
 
-  @Override
-  public void onMessage(WebSocket webSocket, ByteString bytes) {
-    log.info("Server received: " + bytes.hex());
-  }
+    Scheduler scheduler = Schedulers.parallel();
+    Queue<Runnable> steps = new ConcurrentLinkedQueue<>();
 
-  @Override
-  public void onClosing(WebSocket webSocket, int code, String reason) {
-    log.info("CLOSE: " + code + " " + reason);
-  }
-
-  @Override
-  public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-    log.log(Level.WARNING, "WebSocket Failure", t);
-  }
-
-  public WebSocketEventsBuilder awaitOpen() {
-    builder = new WebSocketEventsBuilder();
-    return builder;
+    return new ClosedWebSocketStepsBuilder(listener, scheduler, steps);
   }
 }
