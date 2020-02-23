@@ -109,6 +109,7 @@ public final class OpenWebSocketStepsBuilder {
   protected void testWasMessage(Predicate<String> bodyMatcher, Duration timeout) {
     synchronized (mockWebSocketListener.getSyncEvent()) {
       try {
+        log.info("Waiting on MESSAGE");
         mockWebSocketListener.getSyncEvent().wait(timeout.toMillis());
         WebSocketStepType nextStep =
             Optional.ofNullable(mockWebSocketListener.getSteps().poll())
@@ -136,6 +137,7 @@ public final class OpenWebSocketStepsBuilder {
     steps.add(
         () -> {
           try {
+            log.info("Waiting for " + period);
             TimeUnit.MILLISECONDS.sleep(period.toMillis());
           } catch (InterruptedException ex) {
             log.info(WAIT_INTERRUPTED_MESSAGE);
@@ -160,6 +162,7 @@ public final class OpenWebSocketStepsBuilder {
         () -> {
           synchronized (mockWebSocketListener.getSyncEvent()) {
             try {
+              log.info("Waiting on CLOSE");
               mockWebSocketListener.getSyncEvent().wait(timeout.toMillis());
               WebSocketStepType nextStep =
                   Optional.ofNullable(mockWebSocketListener.getSteps().poll())

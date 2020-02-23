@@ -6,15 +6,12 @@ import java.io.IOException;
 import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
 import org.springframework.web.reactive.socket.client.WebSocketClient;
 
-@RunWith(SpringRunner.class)
 @ActiveProfiles({ "unittest" })
 @SpringBootTest(classes = WebSocketConfiguration.class)
 public class EchoWebSocketTest {
@@ -24,8 +21,8 @@ public class EchoWebSocketTest {
 
     MockServerWithWebSocket mockServer = new MockServerWithWebSocket();
 
-    mockServer.verifier()
-        .waitServerStartThenUpgrade()
+    mockServer.beginVerifier()
+        .thenWaitServerStartThenUpgrade()
         .thenExpectOpen()
         .thenSend("MESSAGE 1")
         .thenWait(Duration.ofMillis(500))
@@ -38,6 +35,7 @@ public class EchoWebSocketTest {
         .thenSend("MESSAGE 5")
         .thenWait(Duration.ofMillis(500))
         .thenClose()
+        .thenWaitServerShutdown()
         .thenVerify();        
 
     WebSocketClient client = new ReactorNettyWebSocketClient();

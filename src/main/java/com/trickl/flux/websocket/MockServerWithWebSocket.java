@@ -17,8 +17,8 @@ public class MockServerWithWebSocket {
   MockWebSocketListener webSocketListener = new MockWebSocketListener();
 
   /** Expect an open event. */
-  public ClosedWebSocketStepsBuilder verifier() {
-    Scheduler scheduler = Schedulers.parallel();
+  public ClosedWebSocketStepsBuilder beginVerifier() {
+    Scheduler scheduler = Schedulers.newParallel("verifier");
     Queue<Runnable> steps = new ConcurrentLinkedQueue<>();
 
     return new ClosedWebSocketStepsBuilder(
