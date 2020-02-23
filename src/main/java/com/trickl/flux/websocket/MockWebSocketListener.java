@@ -18,7 +18,7 @@ public final class MockWebSocketListener extends WebSocketListener {
 
   protected Throwable failure = null;
 
-  protected Queue<StepType> steps = new ConcurrentLinkedDeque<>();
+  protected Queue<WebSocketStepType> steps = new ConcurrentLinkedDeque<>();
 
   protected WebSocket webSocket = null;
 
@@ -28,7 +28,7 @@ public final class MockWebSocketListener extends WebSocketListener {
   public void onOpen(WebSocket webSocket, Response response) {
     synchronized (syncEvent) {
       log.info("OPEN");
-      steps.add(StepType.OPEN);
+      steps.add(WebSocketStepType.OPEN);
       this.webSocket = webSocket;
       syncEvent.notifyAll();
     }
@@ -39,7 +39,7 @@ public final class MockWebSocketListener extends WebSocketListener {
     synchronized (syncEvent) {
       log.info("Server received: " + text);
       messages.add(text);
-      steps.add(StepType.MESSAGE);
+      steps.add(WebSocketStepType.MESSAGE);
       syncEvent.notifyAll();
     }
   }
@@ -53,7 +53,7 @@ public final class MockWebSocketListener extends WebSocketListener {
   public void onClosing(WebSocket webSocket, int code, String reason) {
     synchronized (syncEvent) {
       log.info("CLOSE: " + code + " " + reason);
-      steps.add(StepType.CLOSE);
+      steps.add(WebSocketStepType.CLOSE);
       this.webSocket = null;
       syncEvent.notifyAll();
     }
@@ -64,7 +64,7 @@ public final class MockWebSocketListener extends WebSocketListener {
     synchronized (syncEvent) {
       log.log(Level.WARNING, "WebSocket Failure", throwable);
       failure = throwable;
-      steps.add(StepType.FAILURE);
+      steps.add(WebSocketStepType.FAILURE);
       syncEvent.notifyAll();
     }
   }

@@ -1,17 +1,12 @@
 package com.trickl.flux.websocket;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trickl.flux.config.WebSocketConfiguration;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.regex.Pattern;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,28 +17,16 @@ import org.springframework.web.reactive.socket.client.WebSocketClient;
 @RunWith(SpringRunner.class)
 @ActiveProfiles({ "unittest" })
 @SpringBootTest(classes = WebSocketConfiguration.class)
-public class EchoWebSocketTest extends BaseWebSocketClientTest {
-
-  @Autowired
-  ObjectMapper objectMapper = new ObjectMapper();
-
-  @BeforeEach
-  private void setup() {
-    startServer(objectMapper);
-  }
-
-  @AfterEach
-  private void shutdown() throws IOException, InterruptedException {
-    server.shutdown();
-  }
+public class EchoWebSocketTest {
 
   @Test
-  public void testEchoWebSocket() throws IOException, InterruptedException {
+  public void testEchoWebSocket() throws IOException {
 
-    new MockWebSocket(server)
-        .verifier()
-        .thenExpectOpen(Duration.ofSeconds(3))
-        //.thenExpectMessage(Pattern.compile("CONNECT.*"), Duration.ofSeconds(3))
+    MockServerWithWebSocket mockServer = new MockServerWithWebSocket();
+
+    mockServer.verifier()
+        .waitServerStartThenUpgrade()
+        .thenExpectOpen()
         .thenSend("MESSAGE 1")
         .thenWait(Duration.ofMillis(500))
         .thenSend("MESSAGE 2") 
@@ -54,13 +37,16 @@ public class EchoWebSocketTest extends BaseWebSocketClientTest {
         .thenWait(Duration.ofMillis(500))
         .thenSend("MESSAGE 5")
         .thenWait(Duration.ofMillis(500))
-        .thenCloseAndVerify();        
+        .thenClose()
+        .thenVerify();        
 
     WebSocketClient client = new ReactorNettyWebSocketClient();
     EchoWebSocketHandler handler = new EchoWebSocketHandler();
+    mockServer.start();
     client
-        .execute(server.url("/websocket").uri(), new HttpHeaders(), handler)
+        .execute(mockServer.getWebSocketUri(), new HttpHeaders(), handler)
         .log("SESSION")
         .block(Duration.ofSeconds(60));
+    mockServer.shutdown();
   }
 }
