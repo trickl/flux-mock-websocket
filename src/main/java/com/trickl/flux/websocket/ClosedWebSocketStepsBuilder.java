@@ -121,6 +121,7 @@ public final class ClosedWebSocketStepsBuilder {
         if (!nextStep.equals(WebSocketStepType.OPEN)) {
           throw new StepVerifierException("Expected OPEN got - " + nextStep);
         }
+        serverSupplier.get().takeRequest();
       } catch (InterruptedException ex) {
         log.info(WAIT_INTERRUPTED_MESSAGE);
         Thread.currentThread().interrupt();

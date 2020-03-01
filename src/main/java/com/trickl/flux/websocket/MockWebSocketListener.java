@@ -61,6 +61,10 @@ public final class MockWebSocketListener extends WebSocketListener {
 
   @Override
   public void onFailure(WebSocket webSocket, Throwable throwable, Response response) {
+    if ("Socket closed".equals(throwable.getMessage())) {
+      onClosing(webSocket, 1006, "Forced closure.");
+      return;
+    }
     synchronized (syncEvent) {
       log.log(Level.WARNING, "WebSocket Failure", throwable);
       failure = throwable;
