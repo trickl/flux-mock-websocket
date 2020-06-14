@@ -147,7 +147,7 @@ public final class OpenWebSocketStepsBuilder {
     return this;
   }
 
-  /** Expect the socket to be closed. */
+  /** Expect the socket to be closing. */
   public ClosedWebSocketStepsBuilder thenExpectClose() {
     return thenExpectClose(Duration.ofSeconds(10));
   }
@@ -158,6 +158,28 @@ public final class OpenWebSocketStepsBuilder {
    * @param timeout How long to wait
    */
   public ClosedWebSocketStepsBuilder thenExpectClose(Duration timeout) {
+    steps.add(
+        () -> {
+          synchronized (mockWebSocketListener.getSyncEvent()) {
+            try {
+              log.info("Waiting on CLOSING");
+              mockWebSocketListener.getSyncEvent().wait(timeout.toMillis());
+              WebSocketStepType nextStep =
+                  Optional.ofNullable(mockWebSocketListener.getSteps().poll())
+                      .orElse(WebSocketStepType.NOTHING);
+              if (!nextStep.equals(WebSocketStepType.CLOSING)) {
+                throw new StepVerifierException("Expected CLOSING got - " + nextStep);
+              }
+            } catch (InterruptedException ex) {
+              log.info(WAIT_INTERRUPTED_MESSAGE);
+              Thread.currentThread().interrupt();
+            }
+          }
+        });
+
+    // Respond to the request by cancelling
+    thenClose();
+
     steps.add(
         () -> {
           synchronized (mockWebSocketListener.getSyncEvent()) {
@@ -187,7 +209,7 @@ public final class OpenWebSocketStepsBuilder {
         () -> {
           WebSocket ws = mockWebSocketListener.getWebSocket();
           if (ws != null) {
-            log.info("Terminating connection.");
+            log.info("Terminating connection.");            
             ws.close(CloseStatus.NORMAL.getCode(), "Normal termination.");
           }
         });

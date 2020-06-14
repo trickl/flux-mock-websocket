@@ -52,7 +52,16 @@ public final class MockWebSocketListener extends WebSocketListener {
   @Override
   public void onClosing(WebSocket webSocket, int code, String reason) {
     synchronized (syncEvent) {
-      log.info("CLOSE: " + code + " " + reason);
+      log.info("CLOSING: " + code + " " + reason);      
+      steps.add(WebSocketStepType.CLOSING);
+      syncEvent.notifyAll();
+    }
+  }
+
+  @Override
+  public void onClosed(WebSocket webSocket, int code, String reason) {
+    synchronized (syncEvent) {
+      log.info("CLOSED: " + code + " " + reason);
       steps.add(WebSocketStepType.CLOSE);
       this.webSocket = null;
       syncEvent.notifyAll();
@@ -61,10 +70,6 @@ public final class MockWebSocketListener extends WebSocketListener {
 
   @Override
   public void onFailure(WebSocket webSocket, Throwable throwable, Response response) {
-    if ("Socket closed".equals(throwable.getMessage())) {
-      onClosing(webSocket, 1006, "Forced closure.");
-      return;
-    }
     synchronized (syncEvent) {
       log.log(Level.WARNING, "WebSocket Failure", throwable);
       failure = throwable;
