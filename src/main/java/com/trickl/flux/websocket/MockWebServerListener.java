@@ -1,5 +1,8 @@
 package com.trickl.flux.websocket;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import lombok.Getter;
@@ -34,5 +37,23 @@ public final class MockWebServerListener implements ServerListener {
       this.server = null;
       syncEvent.notifyAll();
     }
+  }
+
+  WebServerStepType nextStep(Duration timeout) {
+    synchronized (syncEvent) {      
+      Instant start = Instant.now();
+      Instant timeoutTime = start.plus(timeout);
+      while (steps.isEmpty() && Instant.now().isBefore(timeoutTime)) {
+        try {
+          syncEvent.wait(Math.max(Duration.between(Instant.now(), timeoutTime).toMillis(), 0));
+        } catch (InterruptedException ex) {
+          log.info("Wait Interrupted");
+          Thread.currentThread().interrupt();
+        }    
+      }
+
+      return Optional.ofNullable(steps.poll())
+          .orElse(WebServerStepType.NOTHING);   
+    }  
   }
 }

@@ -2,7 +2,6 @@ package com.trickl.flux.websocket;
 
 import com.trickl.exceptions.StepVerifierException;
 import java.time.Duration;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +24,6 @@ public final class ClosedWebSocketStepsBuilder {
 
   private final Queue<Runnable> steps;
 
-  private static final String WAIT_INTERRUPTED_MESSAGE = "Wait Interrupted";
-
   /** Wait for the server to be started and available. */
   public ClosedWebSocketStepsBuilder thenWaitServerShutdown() {
     return thenWaitServerShutdown(Duration.ofSeconds(10));
@@ -40,21 +37,11 @@ public final class ClosedWebSocketStepsBuilder {
   }
 
   protected void testWasShutdown(Duration timeout) {
-    synchronized (mockWebServerListener.getSyncEvent()) {
-      try {
-        log.info("Waiting on SERVER_SHUTDOWN");
-        mockWebServerListener.getSyncEvent().wait(timeout.toMillis());
-        WebServerStepType nextStep =
-            Optional.ofNullable(mockWebServerListener.getSteps().poll())
-                .orElse(WebServerStepType.NOTHING);
-        if (!nextStep.equals(WebServerStepType.SERVER_SHUTDOWN)) {
-          throw new StepVerifierException("Expected SERVER_SHUTDOWN got - " + nextStep);
-        }
-      } catch (InterruptedException ex) {
-        log.info(WAIT_INTERRUPTED_MESSAGE);
-        Thread.currentThread().interrupt();
-      }
-    }
+    log.info("Waiting on SERVER_SHUTDOWN");
+    WebServerStepType nextStep = mockWebServerListener.nextStep(timeout);
+    if (!nextStep.equals(WebServerStepType.SERVER_SHUTDOWN)) {
+      throw new StepVerifierException("Expected SERVER_SHUTDOWN got - " + nextStep);
+    }    
   }
 
 
@@ -76,21 +63,11 @@ public final class ClosedWebSocketStepsBuilder {
   }
 
   protected void testWasStarted(Duration timeout) {
-    synchronized (mockWebServerListener.getSyncEvent()) {
-      try {
-        log.info("Waiting on SERVER_START");
-        mockWebServerListener.getSyncEvent().wait(timeout.toMillis());
-        WebServerStepType nextStep =
-            Optional.ofNullable(mockWebServerListener.getSteps().poll())
-                .orElse(WebServerStepType.NOTHING);
-        if (!nextStep.equals(WebServerStepType.SERVER_START)) {
-          throw new StepVerifierException("Expected SERVER_START got - " + nextStep);
-        }
-      } catch (InterruptedException ex) {
-        log.info(WAIT_INTERRUPTED_MESSAGE);
-        Thread.currentThread().interrupt();
-      }
-    }
+    log.info("Waiting on SERVER_START");
+    WebServerStepType nextStep = mockWebServerListener.nextStep(timeout);
+    if (!nextStep.equals(WebServerStepType.SERVER_START)) {
+      throw new StepVerifierException("Expected SERVER_START got - " + nextStep);
+    }    
   }
 
   /** Expect the socket to be opened. */
@@ -111,22 +88,11 @@ public final class ClosedWebSocketStepsBuilder {
   }
 
   protected void testWasOpen(Duration timeout) {
-    synchronized (mockWebSocketListener.getSyncEvent()) {
-      try {
-        log.info("Waiting on OPEN");
-        mockWebSocketListener.getSyncEvent().wait(timeout.toMillis());
-        WebSocketStepType nextStep =
-            Optional.ofNullable(mockWebSocketListener.getSteps().poll())
-                .orElse(WebSocketStepType.NOTHING);
-        if (!nextStep.equals(WebSocketStepType.OPEN)) {
-          throw new StepVerifierException("Expected OPEN got - " + nextStep);
-        }
-        serverSupplier.get().takeRequest();
-      } catch (InterruptedException ex) {
-        log.info(WAIT_INTERRUPTED_MESSAGE);
-        Thread.currentThread().interrupt();
-      }
-    }
+    log.info("Waiting on OPEN");
+    WebSocketStepType nextStep = mockWebSocketListener.nextStep(timeout);
+    if (!nextStep.equals(WebSocketStepType.OPEN)) {
+      throw new StepVerifierException("Expected OPEN got - " + nextStep);
+    }        
   }
 
   /** Verify the steps ran. */

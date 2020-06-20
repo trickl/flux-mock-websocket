@@ -107,24 +107,14 @@ public final class OpenWebSocketStepsBuilder {
   }
 
   protected void testWasMessage(Predicate<String> bodyMatcher, Duration timeout) {
-    synchronized (mockWebSocketListener.getSyncEvent()) {
-      try {
-        log.info("Waiting on MESSAGE");
-        mockWebSocketListener.getSyncEvent().wait(timeout.toMillis());
-        WebSocketStepType nextStep =
-            Optional.ofNullable(mockWebSocketListener.getSteps().poll())
-                .orElse(WebSocketStepType.NOTHING);
-        String nextMessage =
+    log.info("Waiting on MESSAGE");
+    WebSocketStepType nextStep = mockWebSocketListener.nextStep(timeout);
+    String nextMessage =
             Optional.ofNullable(mockWebSocketListener.getMessages().poll()).orElse("<null>");
-        if (!nextStep.equals(WebSocketStepType.MESSAGE)) {
-          throw new StepVerifierException("Expected MESSAGE got - " + nextStep);
-        } else if (!bodyMatcher.test(nextMessage)) {
-          throw new StepVerifierException("Unexpected message - " + nextMessage);
-        }
-      } catch (InterruptedException ex) {
-        log.info(WAIT_INTERRUPTED_MESSAGE);
-        Thread.currentThread().interrupt();
-      }
+    if (!nextStep.equals(WebSocketStepType.MESSAGE)) {
+      throw new StepVerifierException("Expected MESSAGE got - " + nextStep);
+    } else if (!bodyMatcher.test(nextMessage)) {
+      throw new StepVerifierException("Unexpected message - " + nextMessage);
     }
   }
 
@@ -160,20 +150,10 @@ public final class OpenWebSocketStepsBuilder {
   public ClosedWebSocketStepsBuilder thenExpectClose(Duration timeout) {
     steps.add(
         () -> {
-          synchronized (mockWebSocketListener.getSyncEvent()) {
-            try {
-              log.info("Waiting on CLOSING");
-              mockWebSocketListener.getSyncEvent().wait(timeout.toMillis());
-              WebSocketStepType nextStep =
-                  Optional.ofNullable(mockWebSocketListener.getSteps().poll())
-                      .orElse(WebSocketStepType.NOTHING);
-              if (!nextStep.equals(WebSocketStepType.CLOSING)) {
-                throw new StepVerifierException("Expected CLOSING got - " + nextStep);
-              }
-            } catch (InterruptedException ex) {
-              log.info(WAIT_INTERRUPTED_MESSAGE);
-              Thread.currentThread().interrupt();
-            }
+          log.info("Waiting on CLOSING");
+          WebSocketStepType nextStep = mockWebSocketListener.nextStep(timeout);
+          if (!nextStep.equals(WebSocketStepType.CLOSING)) {
+            throw new StepVerifierException("Expected CLOSING got - " + nextStep);
           }
         });
 
@@ -182,20 +162,10 @@ public final class OpenWebSocketStepsBuilder {
 
     steps.add(
         () -> {
-          synchronized (mockWebSocketListener.getSyncEvent()) {
-            try {
-              log.info("Waiting on CLOSE");
-              mockWebSocketListener.getSyncEvent().wait(timeout.toMillis());
-              WebSocketStepType nextStep =
-                  Optional.ofNullable(mockWebSocketListener.getSteps().poll())
-                      .orElse(WebSocketStepType.NOTHING);
-              if (!nextStep.equals(WebSocketStepType.CLOSE)) {
-                throw new StepVerifierException("Expected CLOSE got - " + nextStep);
-              }
-            } catch (InterruptedException ex) {
-              log.info(WAIT_INTERRUPTED_MESSAGE);
-              Thread.currentThread().interrupt();
-            }
+          log.info("Waiting on CLOSE");
+          WebSocketStepType nextStep = mockWebSocketListener.nextStep(timeout);
+          if (!nextStep.equals(WebSocketStepType.CLOSE)) {
+            throw new StepVerifierException("Expected CLOSE got - " + nextStep);
           }
         });
 
