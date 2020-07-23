@@ -1,0 +1,40 @@
+language: java
+jdk:
+- openjdk8
+env:
+  global:
+  - CC_TEST_REPORTER_ID=ad726a66cbc822dd1b628ea1610dec8d04121462331a81939ccd1c4c45f4e151
+  - secure: H/Fh3tshbgVpwxuQfg/rUImyTCRDd2H2fxUXInDdYhwpUD5m1z3dXYpwTOms5+ArWmRgHJrVdcxU0zW2oiZpqwN6+O8zcBdlMoO9J5N8uaSs4q6nc97O4cBLb0bEZs7Jy5Vm4xSeH/2i1N690gNaVHZKBv0FCI63YCmxrd+Jb3KYtv9VeXHnFQMbUFpeIevVmJg12k8Ms+KOLc5yA+doxtapJJrtwcgU1oeKkrs/QFM2xt6LAwuHSroOthHviH2Lj7IinSxDwoFMlmht1r9sP27+C9D5Ql1biwB1yB5HDXRFxRdMQ6aP/R4Ah1JMRn7cxGLL0VrTMMOML5HUjWkmzD9xm429/9PuR+SxgV7FVrrtSX5I/H/sPHcpVqbM9DV8LRixhjmcl2PhPQ674qnQgtZwt6MQ0Yn7qw5NH4zdKthsSEs9o3MPSQfbT4ks72l4/E/Vtj5rWdFPtSxcSSomiopAETzwXveTkr5suwiCg0rHD+/b8KYNK2fNbzuHPpSC+TtF7xJg5i/EdvlkMaDTKGk7ISekIJzC9GGQVURf/xC/9NE0LgsA1FVjsRm/B6ANrnb4WX53fzE5LbUsqvi+SCRujBrwYC158vIv7VkhMZLH3faiFVO6oqQGWib8y7tWL3A7ubuql3XnqfzjNFcoUAD1B4LtUm4o1MBykPmtzaQ=
+  - secure: UplUvswQCKLYtcc6Az6VAD/cDslNgo9l+FYGQDcMFbfye7r9XUBEo6oFYGATZ7Wz5PWJYfyru7pLvZKzyVpX37Vl8bisOI36GOYniO7sTjJzlX1W5ifFYQsSQyYTWjAIdpFBvagI6wVslq0o9KmoEn9XB0W/GcP2FD1wFjlkqUJ+RSINXs1SrNRmhTg0QYq78LcilyktudvMvUdIahVpkQitrYKYEAFi7YNEiM1fTYrKYVno9tWoa5RK7srul7mMqwn9rLWrQnIMkcwil0mG/0U6t87XfBGt2MTh++IY9OISlij4cvbjoDV7xlxudYesJwnJQXt4lecEKQKcsbZl7lnrxxLSyNNdLLHt6TwwoZqQGMNU2FSoXZgXyMhXseWBtF/DBT8hfYI0V6uxbbJJ8KhMfhEj98AjFc9WObAVESQaJjubkLzzhUC0A3kBEts4Zv56fRz1pPrZYwuzmmyhMRJoQVv/G0K4hQKMTroeot3Qgu5lWiSri3fH5GKXRxI1257+YrqbZehBybOKmRcdp5LNYQOOcXXCNyjAJJcfc9yZfmz28wppdLFKXTzYh7tVvonLFdrja047cFxh/+46VqpaZB33bpRv7vnMsGkmH/bPDCVRSXWY0gw7QdpsmDt2P+MOfLuimYDpO5wIorJ6Aly0LEZjV8sOubzOfiZNtmE=
+  - secure: iXdMZUCOaiAMFmXvcbdVsD7d0yhTx79nAOddsS10bFN3JXli4YaOSYwKEUGWDVpVbMGUUMfUEWpz2xyg+9Ep5US04RYbOeYt2X4yHGAZXJUdybvRP8CjLEITkUF9cDk1mL1bNLAbi9wV2sWGvx8BRxFOlY/j/m288f+ACWZBhn1Bo5/HkKl2Ghxg4uToONX5dRICXXBzByRQWoshQKCwcoqnbU8DpRrtWiVyQ7ggLdX+uoIjwRiXKkjhWr3i+iDu5G10tR0lgS+rYH7rvrYimdEOu2bjayBV6dXi/FegxfMr/qonkWTKBhY3PjJCHFRQM6vI5Yq+LO4uh6Slx5thmeNfe/0Vz6XAjPSpIySU7UbgfG9hW5tgkgynQfsIKdcYicN/eY+cLAhA9Jgr8bRInClQJkvKnIFKifgvZK3zFhbQe0OH8xnzFB6Tkpo2oCSfejqS7a4kN1SiM8MYOOfGamjQPemKKHqHvt8mjv/jV+8ZurJKRF3ClqSagaXJvvexJopqRAtlFt29imC1YvMF5eC/GAH479GPFJfFlqAFmvBY4wThxkAUvB6BsVbg5ckivLFjEqeY+LaiPojRF9pnLcdECo7gnPa4RorpBri8eKCUxN1X/KjpEBlTQPHIyAgsvmg6/ztxIYVtTBOXi0gHpYqNAty+Wl2430/A6RoPXyY=
+install:
+- mvn --settings .travis/settings.xml install -DskipTests=true -Dgpg.skip -Dmaven.javadoc.skip=true
+  -B -V
+before_script:
+- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64
+  > ./cc-test-reporter
+- chmod +x ./cc-test-reporter
+- "./cc-test-reporter before-build"
+- ".travis/before-script.sh"
+script:
+- mvn test
+- "./cc-test-reporter format-coverage -d -t jacoco ./target/jacoco-ut/jacoco.xml"
+- "./cc-test-reporter upload-coverage -d"
+before_deploy:
+- mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
+- export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep
+  -v '\[')
+deploy:
+- provider: script
+  script: ".travis/deploy.sh"
+  skip_cleanup: true
+  on:
+    repo: trickl/flux-mock-websocket
+    all_branches: true
+- provider: releases
+  api_key:
+    secure: FNIu117YxyDNbEOPiARQfStFAw22YGrPhahbnjarr1y6xbslPmArc+RmcKYb7aDbJoQLARVPTR3D8Eju6vwPkJyHa2II7xT/G4PIA6IC4Joham99wMl30+OLLethoUrQPgWgMgdSt/nkEkcm743OqflMBkUEJbX7NOl5CE9LiZL60u0gK/lfhwDhLlXbP1bfG9MsGwQ0ONZWW6egcLsZcmBc/9iXxQtExQrizzT74DW0KC3ZpiW37Pgw8LVfwRgZwdzrVbX2JhDaEo/ezdGId8Np3aNoyMxCRVo72zlRHcXhLTRC4syoyv+FUTz5yzqIx9t4l6B425A8T86tmbQW3NnardxLSVkfGzw1KjkBrwaAMBIMtj4rW+obkUxwxN42g177E2LdrgiC+MDFwSBfYJih4+V8v8rEg6mtehnR3iX4cvgmbFEAh9/piM+C8EvZZImNS6cKF3B+wcXIj+IA7nJid6Dqa4CYASD9nlAiu/ZS3sre1+BpNSLXoExlqsa+1b4B1kDGvY8MMeB2wLH7yzPZw1jnGUUVlxzwuTX0YBCO2iNBS4eNndeOtOpuhAs0ghKULRMFOSf/YDenSNham5M7YGbtmLyOrsfm5W+7ygxH9gmrRzC3JGSsKWDYBgyCgsZ3oaiTJt61A1y7HuW2AVoHivui1lTjMAQrDBSPBjI=
+  file: ".travis.yml"
+  on:
+    repo: trickl/flux-mock-websocket
+  skip_cleanup: 'true'
