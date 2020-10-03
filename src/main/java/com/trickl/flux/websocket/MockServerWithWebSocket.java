@@ -26,7 +26,9 @@ public class MockServerWithWebSocket {
   private final Duration waitStartTimeout = Duration.ofSeconds(10);
   Semaphore canStartSemaphore = new Semaphore(1);
 
-  /** Expect an open event. */
+  /** Expect an open event. 
+   * @return The verifier builder 
+  */
   public ClosedWebSocketStepsBuilder beginVerifier() {
     Scheduler scheduler = Schedulers.newParallel("verifier");
     Queue<Runnable> steps = new ConcurrentLinkedQueue<>();
@@ -58,7 +60,9 @@ public class MockServerWithWebSocket {
     }
   }
 
-  /** Shutdown the mock web server. */
+  /** Shutdown the mock web server. 
+   * @throws IOException if the server cannot be shutdown
+  */
   public void shutdown() throws IOException {
     mockServer.shutdown();
     serverListener.onShutdown();

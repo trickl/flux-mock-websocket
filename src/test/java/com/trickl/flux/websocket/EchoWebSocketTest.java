@@ -1,10 +1,8 @@
 package com.trickl.flux.websocket;
 
 import com.trickl.flux.config.WebSocketConfiguration;
-
 import java.io.IOException;
 import java.time.Duration;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +19,7 @@ public class EchoWebSocketTest {
 
     MockServerWithWebSocket mockServer = new MockServerWithWebSocket();
 
-    mockServer.beginVerifier()
+    final VerifierComplete verifierComplete = mockServer.beginVerifier()
         .thenWaitServerStartThenUpgrade()
         .thenExpectOpen()
         .thenSend("MESSAGE 1")
@@ -46,5 +44,7 @@ public class EchoWebSocketTest {
         .log("SESSION")
         .block(Duration.ofSeconds(60));
     mockServer.shutdown();
+
+    verifierComplete.waitComplete();
   }
 }

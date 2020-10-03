@@ -35,6 +35,7 @@ public final class OpenWebSocketStepsBuilder {
    * Schedule sending a websocket message.
    *
    * @param payload The message payloadfto send
+   * @return The verifier builder
    */
   public OpenWebSocketStepsBuilder thenSend(final String payload) {
     steps.add(
@@ -51,6 +52,7 @@ public final class OpenWebSocketStepsBuilder {
    * Expect a message within a timeframe.
    *
    * @param body expected message body
+   * @return The verifier builder
    */
   public OpenWebSocketStepsBuilder thenExpectMessage(String body) {
     return thenExpectMessage(body, Duration.ofSeconds(10));
@@ -61,6 +63,7 @@ public final class OpenWebSocketStepsBuilder {
    *
    * @param body expected message body
    * @param timeout How long to wait
+   * @return The verifier builder
    */
   public OpenWebSocketStepsBuilder thenExpectMessage(String body, Duration timeout) {
     return thenExpectMessage(text -> text.equals(body), timeout);
@@ -70,6 +73,7 @@ public final class OpenWebSocketStepsBuilder {
    * Expect a message within a timeframe.
    *
    * @param bodyPattern test for message content
+   * @return The verifier builder
    */
   public OpenWebSocketStepsBuilder thenExpectMessage(Pattern bodyPattern) {
     return thenExpectMessage(bodyPattern, Duration.ofSeconds(10));
@@ -80,6 +84,7 @@ public final class OpenWebSocketStepsBuilder {
    *
    * @param bodyPattern test for message content
    * @param timeout How long to wait
+   * @return The verifier builder
    */
   public OpenWebSocketStepsBuilder thenExpectMessage(Pattern bodyPattern, Duration timeout) {
     return thenExpectMessage(text -> bodyPattern.matcher(text).matches(), timeout);
@@ -89,6 +94,7 @@ public final class OpenWebSocketStepsBuilder {
    * Expect a message within a timeframe.
    *
    * @param bodyMatcher test for message content
+   * @return The verifier builder
    */
   public OpenWebSocketStepsBuilder thenExpectMessage(Predicate<String> bodyMatcher) {
     return thenExpectMessage(bodyMatcher, Duration.ofSeconds(10));
@@ -99,6 +105,7 @@ public final class OpenWebSocketStepsBuilder {
    *
    * @param bodyMatcher test for message content
    * @param timeout How long to wait
+   * @return The verifier builder
    */
   public OpenWebSocketStepsBuilder thenExpectMessage(
       Predicate<String> bodyMatcher, Duration timeout) {
@@ -122,6 +129,7 @@ public final class OpenWebSocketStepsBuilder {
    * Wait a period of time doing nothing.
    *
    * @param period how long to wait
+   * @return The verifier builder
    */
   public OpenWebSocketStepsBuilder thenWait(Duration period) {
     steps.add(
@@ -137,7 +145,10 @@ public final class OpenWebSocketStepsBuilder {
     return this;
   }
 
-  /** Expect the socket to be closing. */
+  /** Expect the socket to be closing.
+   * @return The verifier builder
+   * 
+   */
   public ClosedWebSocketStepsBuilder thenExpectClose() {
     return thenExpectClose(Duration.ofSeconds(10));
   }
@@ -146,6 +157,7 @@ public final class OpenWebSocketStepsBuilder {
    * Expect the socket to be closed.
    *
    * @param timeout How long to wait
+   * @return The verifier builder
    */
   public ClosedWebSocketStepsBuilder thenExpectClose(Duration timeout) {
     steps.add(
@@ -173,7 +185,10 @@ public final class OpenWebSocketStepsBuilder {
         serverSupplier, mockWebServerListener, mockWebSocketListener, scheduler, steps);
   }
 
-  /** Close the connection. */
+  /** Close the connection. 
+   * @return The verifier builder
+   * 
+  */
   public ClosedWebSocketStepsBuilder thenClose() {
     steps.add(
         () -> {
@@ -186,5 +201,14 @@ public final class OpenWebSocketStepsBuilder {
 
     return new ClosedWebSocketStepsBuilder(
         serverSupplier, mockWebServerListener, mockWebSocketListener, scheduler, steps);
+  }
+
+  /** Perform an action. 
+   * @param step the action to complete
+   * @return The verifier builder
+  */
+  public OpenWebSocketStepsBuilder then(Runnable step) {
+    steps.add(step);
+    return this;
   }
 }

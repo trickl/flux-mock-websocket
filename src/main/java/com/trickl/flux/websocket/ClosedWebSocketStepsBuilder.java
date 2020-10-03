@@ -3,6 +3,7 @@ package com.trickl.flux.websocket;
 import com.trickl.exceptions.StepVerifierException;
 import java.time.Duration;
 import java.util.Queue;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -24,12 +25,18 @@ public final class ClosedWebSocketStepsBuilder {
 
   private final Queue<Runnable> steps;
 
-  /** Wait for the server to be started and available. */
+  /** 
+   * Wait for the server to be started and available.
+   * @return The verifier builder
+   * */
   public ClosedWebSocketStepsBuilder thenWaitServerShutdown() {
     return thenWaitServerShutdown(Duration.ofSeconds(10));
   }
 
-  /** Wait for the server to be started and available. */
+  /** Wait for the server to be started and available.
+   * @param timeout How long to wait
+   * @return The verifier builder    
+   */
   public ClosedWebSocketStepsBuilder thenWaitServerShutdown(Duration timeout) {
     steps.add(() -> testWasShutdown(timeout));
 
@@ -45,12 +52,18 @@ public final class ClosedWebSocketStepsBuilder {
   }
 
 
-  /** Wait for the server to be started and available. */
+  /**
+   *  Wait for the server to be started and available.
+   * @return The verifier builder
+   *  */
   public ClosedWebSocketStepsBuilder thenWaitServerStartThenUpgrade() {
     return thenWaitServerStartThenUpgrade(Duration.ofSeconds(10));
   }
 
-  /** Wait for the server to be started and available. */
+  /** Wait for the server to be started and available.
+   * @param timeout How long to wait
+   * @return The verifier builder    
+   */
   public ClosedWebSocketStepsBuilder thenWaitServerStartThenUpgrade(Duration timeout) {
     steps.add(
         () -> {
@@ -70,7 +83,10 @@ public final class ClosedWebSocketStepsBuilder {
     }    
   }
 
-  /** Expect the socket to be opened. */
+  /** Expect the socket to be opened. 
+   * @return The verifier builder
+   * 
+  */
   public OpenWebSocketStepsBuilder thenExpectOpen() {
     return thenExpectOpen(Duration.ofSeconds(10));
   }
@@ -79,6 +95,7 @@ public final class ClosedWebSocketStepsBuilder {
    * Expect the socket to be opened.
    *
    * @param timeout How long to wait
+   * @return The verifier builder
    */
   public OpenWebSocketStepsBuilder thenExpectOpen(Duration timeout) {
     steps.add(() -> testWasOpen(timeout));
@@ -95,13 +112,28 @@ public final class ClosedWebSocketStepsBuilder {
     }        
   }
 
-  /** Verify the steps ran. */
-  public void thenVerify() {
+  /** Perform an action.
+   * @param step the action to complete
+   * @return The verifier builder   
+   */
+  public ClosedWebSocketStepsBuilder then(Runnable step) {
+    steps.add(step);
+    return this;
+  }
+
+  /** Verify the steps ran. 
+   * @return The verification completion object
+   * 
+  */
+  public VerifierComplete thenVerify() {
+    CountDownLatch completeSignal = new CountDownLatch(1);
     scheduler.schedule(
         () -> {
           while (!steps.isEmpty()) {
             steps.remove().run();
           }
+          completeSignal.countDown();
         });
-  }
+    return new VerifierComplete(completeSignal);
+  }  
 }
