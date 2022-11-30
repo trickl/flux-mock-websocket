@@ -185,6 +185,26 @@ public final class OpenWebSocketStepsBuilder {
         serverSupplier, mockWebServerListener, mockWebSocketListener, scheduler, steps);
   }
 
+  /**
+   * Expect the socket to be in a failure state..
+   *
+   * @param timeout How long to wait
+   * @return The verifier builder
+   */
+  public ClosedWebSocketStepsBuilder thenExpectFailure(Duration timeout) {
+    steps.add(
+        () -> {
+          log.info("Waiting on FAILURE");
+          WebSocketStepType nextStep = mockWebSocketListener.nextStep(timeout);
+          if (!nextStep.equals(WebSocketStepType.FAILURE)) {
+            throw new StepVerifierException("Expected FAILURE got - " + nextStep);
+          }
+        });
+
+    return new ClosedWebSocketStepsBuilder(
+        serverSupplier, mockWebServerListener, mockWebSocketListener, scheduler, steps);
+  }
+
   /** Close the connection. 
    * @return The verifier builder
    * 
