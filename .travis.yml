@@ -1,6 +1,6 @@
 language: java
 jdk:
-- openjdk8
+  - openjdk11
 env:
   global:
   - CC_TEST_REPORTER_ID=ad726a66cbc822dd1b628ea1610dec8d04121462331a81939ccd1c4c45f4e151
@@ -33,8 +33,8 @@ deploy:
     all_branches: true
 - provider: releases
   api_key:
-    secure: FNIu117YxyDNbEOPiARQfStFAw22YGrPhahbnjarr1y6xbslPmArc+RmcKYb7aDbJoQLARVPTR3D8Eju6vwPkJyHa2II7xT/G4PIA6IC4Joham99wMl30+OLLethoUrQPgWgMgdSt/nkEkcm743OqflMBkUEJbX7NOl5CE9LiZL60u0gK/lfhwDhLlXbP1bfG9MsGwQ0ONZWW6egcLsZcmBc/9iXxQtExQrizzT74DW0KC3ZpiW37Pgw8LVfwRgZwdzrVbX2JhDaEo/ezdGId8Np3aNoyMxCRVo72zlRHcXhLTRC4syoyv+FUTz5yzqIx9t4l6B425A8T86tmbQW3NnardxLSVkfGzw1KjkBrwaAMBIMtj4rW+obkUxwxN42g177E2LdrgiC+MDFwSBfYJih4+V8v8rEg6mtehnR3iX4cvgmbFEAh9/piM+C8EvZZImNS6cKF3B+wcXIj+IA7nJid6Dqa4CYASD9nlAiu/ZS3sre1+BpNSLXoExlqsa+1b4B1kDGvY8MMeB2wLH7yzPZw1jnGUUVlxzwuTX0YBCO2iNBS4eNndeOtOpuhAs0ghKULRMFOSf/YDenSNham5M7YGbtmLyOrsfm5W+7ygxH9gmrRzC3JGSsKWDYBgyCgsZ3oaiTJt61A1y7HuW2AVoHivui1lTjMAQrDBSPBjI=
-  file: ".travis.yml"
+    secure: BoOe9zmVDjVAbcPY3dgbzXqD9EzBj0HBO/CaluYHmyatxXFIHdKgnhoodYx9vYiJM64SRLXOey8Vep+lJsOWJPbwV1caNNR2Ojb1qv/5ZlyXp2DZw1W+QxZEShRsDM0R8DTebt8ET3e6Ikib6pQYXFE8hHDhfHb+paoWSyoXP/Rb98gltglLgEUyL8Dxz2FjmlGtx4blv3r/Dv2XqtjdbfjyaVlcx9jdKz3SNEjvhQvFi5itxQAjL3WuEdVQyuXWplI4Y3Tj3GFdmvgcdaG50ZfqYr1FJTAL3zjQTdOlWRQW+7R9UjXjcOqFL15t+PEqvZRpDr30ICavKzcJOfCZe4tvYrUPhcORP8rk4x7xBJ9tGosl9xvzO71wTlNwssGRhJ4gALkGclffOUoQqzMaG4KE+AMVnFAmSESwK6E0bh25d3WJZaiD5i8Vrz3IYPoTfIxV2CxpAr3Yyu5AvymyNvWAVjQlW/LJXJTCI2cpBitYmMAj2t/wcCUD4kZzfJ+dDOTsiqk4ox6kPZ4KV490/dId4wvqYvGjc7dvBc73A9bVd4GSWL9EGU9V/wXyw/q1qaEkuF9SNL3KHj7uf3rG21OjsLaAQaj0gDEzS9aMRmVr5SII7FQTyxVcJprf0cmOD6bPix8TS8TumPa8jKD4wBb1mN1F0lzNsbN9iHGH2no=
+  file: "./target/flux-mock-websocket-$project_version.jar"
   on:
     repo: trickl/flux-mock-websocket
   skip_cleanup: 'true'
