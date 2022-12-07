@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.trickl</groupId>
   <artifactId>flux-mock-websocket</artifactId>
-  <version>0.0.5-SNAPSHOT</version>
+  <version>0.0.6-SNAPSHOT</version>
   <packaging>jar</packaging>
   <parent>
     <groupId>org.springframework.boot</groupId>
